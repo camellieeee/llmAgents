@@ -1,11 +1,20 @@
+import warnings
 import whisper
 import os
 from datetime import timedelta
 from tqdm import tqdm
 
+# Suppress FP16 warning on CPU
+warnings.filterwarnings("ignore", message="FP16 is not supported on CPU; using FP32 instead")
+
 def extract_audio_to_md(video_path):
+    # 检查文件是否存在
+    if not os.path.exists(video_path):
+        print(f"错误: 文件 '{video_path}' 不存在")
+        return
+    
     # 加载模型
-    model = whisper.load_model("base")
+    model = whisper.load_model("large")
     
     # 转录音频
     result = model.transcribe(video_path, verbose=False)
@@ -31,4 +40,6 @@ def extract_audio_to_md(video_path):
 
 if __name__ == "__main__":
     video_path = input("请输入视频文件路径: ")
+    # 去除可能的引号
+    video_path = video_path.strip("'\"")
     extract_audio_to_md(video_path)
